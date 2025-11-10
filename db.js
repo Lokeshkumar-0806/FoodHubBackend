@@ -15,17 +15,17 @@ const mongoDB = async () => {
         const db = mongoose.connection.db;
         if (!db) throw new Error("MongoDB connection not ready");
 
-        // Fetch all documents from 'food_items' collection
+        // Fetch all documents from 'food_item' collection
         const collection = db.collection("food_item");
         const data = await collection.find({}).toArray();
-        global.food_item = data;
-        console.log("Fetched food_item:", global.food_item);
+        global.food_items = data;
+        console.log("Fetched food_items:", global.food_items);
 
-        // Fetch all documents from 'food_category' collection
-        const categoryCollection = db.collection("foodCategory");
+        // Fetch all documents from 'foodCateogry' collection
+        const categoryCollection = db.collection("foodCateogry");
         const catData = await categoryCollection.find({}).toArray();
-        global.foodCategory = catData;
-        console.log("Fetched foodCategory:", global.foodCategory);
+        global.food_category = catData;
+        console.log("Fetched food_category:", global.food_category);
 
     } catch (err) {
         console.error("Error connecting to MongoDB or fetching data:", err);
