@@ -31,7 +31,6 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 
 const orderRoutes = require("./Routes/OrderData");
-const paymentRoutes = require("./Routes/payment");
 
 const app = express();
 app.use(cors());
