@@ -49,9 +49,6 @@ const mongoDB = require("./db");
 // Use dynamic port for deployment
 const port = process.env.PORT || 5000;
 
-// Connect to MongoDB
-mongoDB();
-
 // Middleware to parse JSON bodies
 app.use(express.json());
 
@@ -84,7 +81,16 @@ app.use('/api', require("./Routes/DisplayData"));
 app.use('/api', require("./Routes/OrderData"));
 // app.use("/payment", paymentRoute); // Uncomment if using payment
 
-// Start server
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
-});
+const startServer = async () => {
+  try {
+    await mongoDB();
+    // Start server
+    app.listen(port, () => {
+      console.log(`Server running on port ${port}`);
+    });
+  } catch (error) {
+    console.error("Error starting server:", error);
+  }
+};
+
+startServer();

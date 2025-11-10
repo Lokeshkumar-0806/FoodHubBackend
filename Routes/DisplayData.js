@@ -1,31 +1,35 @@
-
 const express = require("express");
 const router = express.Router();
 const Order = require("../models/Orders");
 
-// ✅ Add this route to serve food items and categories
-router.post("/foodData", (req, res) => {
+// ✅ Route for fetching data (food items + categories)
+router.post("/display", (req, res) => {
   try {
+    if (!global.food_items || !global.food_category) {
+      return res.status(500).send("Data not loaded yet. Try again.");
+    }
     res.status(200).send([global.food_items, global.food_category]);
   } catch (error) {
-    console.error(error.message);
+    console.error("Display route error:", error.message);
     res.status(500).send("Server Error");
   }
 });
 
-// ...existing orderData route...
+// ✅ Route for saving order data
 router.post("/orderData", async (req, res) => {
   try {
     const { email, order_data } = req.body;
 
-    // ✅ Map cart items to match schema
-    const formattedItems = order_data.map(item => ({
+    if (!email || !Array.isArray(order_data))
+      return res.status(400).json({ success: false, message: "Invalid request" });
+
+    const formattedItems = order_data.map((item) => ({
       id: item.id || item._id || "",
       name: item.name,
       qty: item.qty,
       size: item.size,
       price: item.price,
-      img: item.img || ""
+      img: item.img || "",
     }));
 
     let existingOrder = await Order.findOne({ email });
@@ -35,10 +39,10 @@ router.post("/orderData", async (req, res) => {
         email,
         order_data: [
           {
-            items: [...formattedItems],   // ✅ Wrap in array
-            order_date: new Date()
-          }
-        ]
+            items: [...formattedItems],
+            order_date: new Date(),
+          },
+        ],
       });
     } else {
       await Order.findOneAndUpdate(
@@ -46,17 +50,17 @@ router.post("/orderData", async (req, res) => {
         {
           $push: {
             order_data: {
-              items: [...formattedItems],  // ✅ Wrap in array
-              order_date: new Date()
-            }
-          }
+              items: [...formattedItems],
+              order_date: new Date(),
+            },
+          },
         }
       );
     }
 
     res.json({ success: true });
   } catch (error) {
-    console.error(error.message);
+    console.error("OrderData route error:", error.message);
     res.status(500).send("Server Error: " + error.message);
   }
 });
